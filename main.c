@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char input[2];
-
 struct Student {
   char name[20];
   char age[3];
@@ -17,9 +15,12 @@ struct Student {
   char roll[20];
   char semester[20];
   char year[20];
+  uint32_t id;
 };
 
 struct Student student;
+
+char input[2];
 
 int printMenu() {
   system("clear");
@@ -67,6 +68,7 @@ void printStudent(struct Student *student) {
   printf("Roll: %s\n", student->roll);
   printf("Semester: %s\n", student->semester);
   printf("Year: %s\n", student->year);
+  printf("ID: %d\n", student->id);
   printf("\n");
 }
 
@@ -89,10 +91,15 @@ struct Student *addStudent() {
   getInput(student.semester, 20);
   printf("Enter Student Year: ");
   getInput(student.year, 20);
+  student.id = rand() % 100;
   return &student;
 }
 int deleteStudent() { return 0; };
-int updateStudent() { return 0; };
+int updateStudent() {
+  printf("Enter Student Name: ");
+  getInput(student.name, 20);
+  return 0;
+};
 int searchStudent() { return 0; };
 
 void makeSelection(char *buf) {
