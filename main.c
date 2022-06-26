@@ -1,10 +1,7 @@
 #include "main.h"
-#include <assert.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 
+int saveStudent();
 struct Student {
   char name[20];
   char age[3];
@@ -38,24 +35,6 @@ int printMenu() {
   return 0;
 }
 
-int getInput(char *buf, size_t size) {
-  assert(size > 0 && size <= INT32_MAX);
-  size_t i = 0;
-  int8_t c;
-
-  while ((c = getchar()) != EOF && c != '\n') {
-    if (i + 1 < size) {
-      buf[i++] = c;
-    }
-  }
-  buf[i] = '\0';
-  if (i == 0) {
-    return EOF;
-  }
-
-  return i;
-}
-
 void printStudent(struct Student *student) {
   system("clear");
   printf("\n");
@@ -70,13 +49,15 @@ void printStudent(struct Student *student) {
   printf("Year: %s\n", student->year);
   printf("ID: %d\n", student->id);
   printf("\n");
+  printf("Press any key to continue...");
+  getchar();
 }
 
 struct Student *addStudent() {
   printf("Enter Student Name: ");
   getInput(student.name, 20);
   printf("Enter Student Age: ");
-  getInput(student.age, 2);
+  getInput(student.age, 3);
   printf("Enter Student Address: ");
   getInput(student.address, 20);
   printf("Enter Student Phone: ");
@@ -92,6 +73,7 @@ struct Student *addStudent() {
   printf("Enter Student Year: ");
   getInput(student.year, 20);
   student.id = rand() % 100;
+  saveStudent(&student);
   return &student;
 }
 int deleteStudent() { return 0; };
@@ -128,8 +110,42 @@ void makeSelection(char *buf) {
   }
 }
 
+int saveStudent(struct Student *student) {
+  FILE *fp;
+  fp = fopen("student.bin", "ab");
+  if (fp == NULL) {
+    printf("Error opening file\n");
+    return 1;
+  }
+  fwrite(&student, sizeof(struct Student), 1, fp);
+  fclose(fp);
+  return 0;
+}
+
+int initialize() {
+  int *buf;
+  buf = (int *)malloc(256);
+  printf("%d\n", *buf);
+  getchar();
+  FILE *fp;
+  fp = fopen("student.bin", "rb");
+  if (fp == NULL) {
+    printf("Error opening file\n");
+  } else {
+    fread(&buf, sizeof(buf), 1, fp);
+    fclose(fp);
+  }
+  fp = fopen("student.bin", "wb");
+  *buf = 1;
+  fwrite(&buf, sizeof(buf), 1, fp);
+  fclose(fp);
+  free(buf);
+  return 0;
+}
+
 int main(int argc, char **argv) {
   while (1) {
+    initialize();
     printMenu();
     makeSelection(input);
   }
